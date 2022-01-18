@@ -1,0 +1,155 @@
+-------------tables--------------
+
+create table if not exists music_platform (
+id serial primary key,
+name varchar(50) not null,
+subscription_price integer check (subscription_price >= 1.25 and subscription_price <= 5.50)
+);
+
+create table if not exists artist (
+id serial primary key,
+nickname varchar(50) not null,
+music_platform_id integer references music_platform(id)
+);
+
+create table if not exists genre (
+id serial primary key,
+genre_name varchar(50) not null
+);
+
+create table if not exists artist_genre (
+artist_id integer references artist(id),
+genre_id integer references genre(id),
+constraint pk primary key (genre_id, artist_id)
+);
+
+create table if not exists album (
+id serial primary key,
+name varchar(100) not null,
+rating integer check (rating >=0 and rating <= 5),
+song_count numeric not null
+);
+
+create table if not exists artist_album (
+id serial primary key,
+artist_id integer references artist(id),
+album_id integer references album(id)
+);
+
+
+
+
+create table if not exists song (
+id integer primary key references album(id),
+name varchar(100) not null,
+rating integer check (rating >=0 and rating <= 5),
+song_lenght_in_seconds numeric not null
+);
+
+create table if not exists playlist(
+id serial primary key,
+name varchar (200) not null,
+release_date text
+);
+
+create table if not exists playlist_song(
+song_id integer references song(id),
+playlist_id integer references playlist(id)
+);
+
+alter table playlist
+drop if exists release_date,
+add if not exists release_year integer not null,
+drop if exists name ,
+add if not exists playlist_name varchar (200);
+
+alter table song
+drop if exists song_lenght_in_minutes,
+add if not exists song_lenght_in_minutes numeric not null,
+drop if exists name,
+add if not exists song_name varchar (50) not null;
+
+alter table album
+add if not exists release_year integer not null,
+drop if exists name ,
+add if not exists album_name varchar (50);
+insert into artist (ID, nickname ) VALUES
+
+-------------data-----------------
+
+
+
+('001','Thundercat'),
+('002','Eminem'),
+('003','Guns and roses'),
+('004','Linkin park'),
+('005','Tyler, the creator' ),
+('006','Sex pistols'),
+('007','C418' ),
+('008','50 Cent' );
+
+insert into genre (ID, genre_name ) VALUES
+('001','Rock'),
+('002','Rap' ),
+('003','Jazz'),
+('004','Synth' ),
+('005','R&B' )
+;
+
+insert into album (ID, album_name, rating, song_count, release_year ) VALUES
+('001','It is what it is', '4', '15','2020'),
+('002','Igor' , '4', '15','2019'),
+('003','The Massacre', '1', '15','2005'),
+('004','Hybrid Theory' , '2', '15','2000'),
+('005','Minecraft - Volume Alpha', '4', '15','2011'),
+('006','Flower boy', '4', '15','2018'),
+('007','Goblin', '5', '15','2015' ),
+('008','Bastard', '5', '15','2014' );
+
+insert into song (ID, song_name, rating, song_lenght_in_minutes  ) VALUES
+('001','a','1','3.5'),
+('002','b','3','2.2'),
+('003','c','2','2.5'),
+('004','d','5','1.8' ),
+('005','e', '3','5'),
+('006','f','4','2.1'),
+('007','My','3','2.8' ),
+('008','h','1' ,'3.2'),
+('099','i','1','6'),
+('010','j','3','2.5' ),
+('011','k','2','3.5'),
+('012','l', '3','2'),
+('013','m', '3','1.9'),
+('014','n','5','1.6'),
+('015','Longest track','4' ,'12')
+;
+
+insert into playlist (ID, playlist_name, release_year ) VALUES
+('001','Rap Caviar', '2018'),
+('002','ROCK' , '2020'),
+('003','Music we love', '2017'),
+('004','Daily100' , '2018'),
+('005','We rap and you listen', '2015' ),
+('006','Alternative rap is best', '2017'),
+('007','Real rap', '2005' ),
+('008','Top 2000', '2022' );
+
+
+
+----------------select req-----------------
+
+
+select song_name, MAX(song_lenght_in_minutes) as max_lenght  from song
+    group by song_name ;
+
+select song_name, song_lenght_in_minutes from song
+    where song_lenght_in_minutes >= 3,5;
+
+select playlist_name, release_year from playlist 
+    where release_year between 2018 and 2020;
+
+select nickname from artist 
+    where trim (both ' ' from nickname) not like '% %'; 
+
+select song_names from song
+    where song_name like '& My &' or '& my &';
